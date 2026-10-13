@@ -1,4 +1,4 @@
-# Crée la clé de signature de l'APK OnlyBrief (à faire UNE SEULE FOIS).
+﻿# Crée la clé de signature de l'APK OnlyBrief (à faire UNE SEULE FOIS).
 # Usage (PowerShell, à la racine du dépôt) :  powershell -ExecutionPolicy Bypass -File outils\creer-cle-signature.ps1
 # La clé est créée HORS du dépôt, dans %USERPROFILE%\OnlyBrief-signature. Ne jamais la commiter.
 
