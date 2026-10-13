@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Secrets locaux (ne jamais commiter)
+.env
+*.keystore
+*.jks
+google-services.json
+compte-service*.json
+
+# Divers
+.DS_Store
+Thumbs.db
