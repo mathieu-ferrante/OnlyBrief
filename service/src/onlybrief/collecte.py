@@ -65,8 +65,8 @@ def _date_entree(entree) -> datetime | None:
 def analyser_flux(contenu: bytes, sujet: Sujet, source: Source) -> list[Article]:
     """Transforme le contenu brut d'un flux en articles."""
     flux = feedparser.parse(contenu)
-    if flux.bozo and not flux.entries:
-        raise ValueError(f"flux illisible ({flux.get('bozo_exception', 'format inconnu')})")
+    if not flux.entries and (flux.bozo or not flux.get("version")):
+        raise ValueError("la réponse n'est pas un flux RSS ou Atom (site fermé ou adresse modifiée ?)")
     articles = []
     for entree in flux.entries:
         titre = texte_brut(entree.get("title", ""), 300)
