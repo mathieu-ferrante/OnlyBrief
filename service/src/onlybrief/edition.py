@@ -12,7 +12,7 @@ from pathlib import Path
 from . import __version__
 from .collecte import collecter
 from .config import charger
-from .dedup import LiensCites, dedoublonner
+from .dedup import LiensCites, dedoublonner, normaliser_lien
 from .filtres import filtrer
 from .horaires import PARIS, heure_publication, iso, maintenant_paris
 from .publication import Section, construire_edition, edition_precedente, publier
@@ -102,6 +102,7 @@ def preparer_edition(
     erreurs += [f"source injoignable {cle} : {msg}" for cle, msg in collecte.erreurs.items()]
     degrade = False
     requetes = 0
+    deja_traites: list[str] = []
 
     for sujet in sujets:
         filtrage = filtrer(collecte.articles, sujet, depuis)
@@ -110,8 +111,11 @@ def preparer_edition(
         ecartes["doublon"] += doublons
         candidats, deja_cites = memoire.filtrer(candidats, jour)
         ecartes["lien déjà cité (14 jours)"] += deja_cites
+        liens_pris = {normaliser_lien(item.article.lien) for s in sections for item in s.items}
+        candidats = [a for a in candidats if normaliser_lien(a.lien) not in liens_pris]
 
-        redaction = rediger(sujet, candidats, client)
+        redaction = rediger(sujet, candidats, client, deja_traites)
+        deja_traites += [item.article.titre for item in redaction.items]
         requetes += redaction.requetes
         ecartes["non retenu par le tri"] += redaction.non_retenus
         if redaction.degrade:

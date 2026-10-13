@@ -179,12 +179,18 @@ def preparer_candidats(articles: list[Article]) -> list[Article]:
     return candidats
 
 
-def construire_messages(sujet: Sujet, candidats: list[Article]) -> tuple[str, str]:
+def construire_messages(sujet: Sujet, candidats: list[Article], deja_traites: list[str] = ()) -> tuple[str, str]:
     consignes = ""
     if sujet.consignes:
         consignes = f"\nConsignes particulières pour cette rubrique : {sujet.consignes}\n"
     if sujet.mots_cles:
         consignes += f"Mots-clés indicatifs de la rubrique : {', '.join(sujet.mots_cles)}.\n"
+    if deja_traites:
+        consignes += (
+            "Faits déjà traités dans d'autres rubriques de l'édition (ne les reprends pas, même sous un autre titre) :\n"
+            + "\n".join(f"- {titre}" for titre in deja_traites) + "\n"
+        )
+    consignes += "À importance comparable, varie les sources.\n"
     systeme = CONSIGNES_GENERALES.format(nom=sujet.nom, max_items=sujet.max_items, consignes=consignes)
     lignes = [
         {
@@ -238,7 +244,9 @@ def rediger_degrade(sujet: Sujet, articles: list[Article]) -> list[ItemRedige]:
     ]
 
 
-def rediger(sujet: Sujet, articles: list[Article], client: ClientModele | None) -> ResultatRedaction:
+def rediger(
+    sujet: Sujet, articles: list[Article], client: ClientModele | None, deja_traites: list[str] = (),
+) -> ResultatRedaction:
     """Choisit et rédige les items d'une section (COL-07, COL-08), avec repli (COL-13)."""
     if not articles:
         return ResultatRedaction(items=[], degrade=False)
@@ -248,7 +256,7 @@ def rediger(sujet: Sujet, articles: list[Article], client: ClientModele | None) 
         return ResultatRedaction(items=items, degrade=True, non_retenus=len(articles) - len(items))
     avant = client.requetes
     try:
-        systeme, utilisateur = construire_messages(sujet, candidats)
+        systeme, utilisateur = construire_messages(sujet, candidats, deja_traites)
         items = _lire_reponse(client.completer(systeme, utilisateur), candidats, sujet.max_items)
     except ModeleIndisponible as exc:
         log.error("Modèle indisponible pour « %s » : %s — repli sur les chapôs RSS", sujet.nom, exc)

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import sys
 from datetime import date
 from pathlib import Path
@@ -28,6 +29,23 @@ def trouver_racine(depart: Path) -> Path:
     if (paquet / "sujets.yaml").exists():
         return paquet
     raise SystemExit("Impossible de trouver sujets.yaml : lancez la commande depuis le dépôt ou utilisez --racine.")
+
+
+def charger_env_local(racine: Path) -> None:
+    """Lit le fichier `.env` local (ignoré par git) pour les essais sur un poste.
+
+    Une variable déjà définie dans l'environnement n'est pas remplacée.
+    Sur GitHub Actions, les clés viennent des secrets du dépôt.
+    """
+    fichier = racine / ".env"
+    if not fichier.exists():
+        return
+    for ligne in fichier.read_text(encoding="utf-8-sig").splitlines():
+        ligne = ligne.strip()
+        if not ligne or ligne.startswith("#") or "=" not in ligne:
+            continue
+        cle, valeur = ligne.split("=", 1)
+        os.environ.setdefault(cle.strip(), valeur.strip().strip('"').strip("'"))
 
 
 def configurer_journal(verbeux: bool) -> None:
@@ -58,6 +76,7 @@ def main(argv: list[str] | None = None) -> int:
     args = analyseur.parse_args(argv)
     configurer_journal(args.verbeux)
     chemins = Chemins(args.racine.resolve() if args.racine else trouver_racine(Path.cwd()))
+    charger_env_local(chemins.racine)
 
     if args.commande == "verifier-config":
         try:
