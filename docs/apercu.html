@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OnlyBrief — aperçu</title>
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --fond: #f5f7fb; --carte: #ffffff; --texte: #1b2433; --doux: #5b6678;
+    --bleu: #1d5fd1; --bleu-pale: #e6efff; --ligne: #dde3ee; --alerte: #a15c00; --alerte-fond: #fff4e0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fond: #10151d; --carte: #19202b; --texte: #e6ebf2; --doux: #9aa6b8;
+      --bleu: #7aa8ff; --bleu-pale: #1d2a42; --ligne: #2b3443; --alerte: #ffc266; --alerte-fond: #3a2a10;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fond); color: var(--texte);
+         font: 1rem/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+  header { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; }
+  h1 { margin: 0; font-size: 1.5rem; color: var(--bleu); }
+  h1 small { color: var(--doux); font-weight: 400; font-size: .9rem; }
+  select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--ligne);
+           background: var(--carte); color: var(--texte); max-width: 100%; }
+  .titre-edition { margin: 16px 0 4px; font-size: 1.15rem; }
+  .bandeau { margin: 12px 0; padding: 10px 12px; border-radius: 10px; background: var(--alerte-fond); color: var(--alerte); }
+  details.section { background: var(--carte); border: 1px solid var(--ligne); border-radius: 12px; margin: 12px 0; }
+  details.section > summary { cursor: pointer; padding: 12px 14px; font-weight: 600; font-size: 1.05rem;
+                              list-style: none; display: flex; justify-content: space-between; gap: 8px; }
+  details.section > summary::-webkit-details-marker { display: none; }
+  details.section > summary::after { content: "▾"; color: var(--doux); }
+  details.section:not([open]) > summary::after { content: "▸"; }
+  .compte { color: var(--doux); font-weight: 400; margin-left: auto; }
+  article { padding: 12px 14px; border-top: 1px solid var(--ligne); }
+  article h3 { margin: 0 0 4px; font-size: 1rem; }
+  article h3 a { color: var(--texte); text-decoration: none; }
+  article h3 a:hover { color: var(--bleu); text-decoration: underline; }
+  .resume { margin: 0 0 6px; }
+  .pourquoi { margin: 0 0 6px; padding: 6px 10px; border-left: 3px solid var(--bleu); background: var(--bleu-pale); border-radius: 0 6px 6px 0; }
+  .pourquoi b { color: var(--bleu); }
+  .meta { color: var(--doux); font-size: .85rem; }
+  .badge { display: inline-block; font-size: .75rem; padding: 1px 6px; border-radius: 6px; background: var(--alerte-fond); color: var(--alerte); margin-left: 6px; }
+  .vide, .echec { padding: 12px 14px; color: var(--doux); border-top: 1px solid var(--ligne); font-style: italic; }
+  .echec { font-size: .85rem; font-style: normal; }
+  details.journal { margin: 24px 0; color: var(--doux); font-size: .85rem; }
+  details.journal pre { white-space: pre-wrap; word-break: break-word; background: var(--carte); padding: 10px; border-radius: 8px; border: 1px solid var(--ligne); }
+  .erreur { color: var(--alerte); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>OnlyBrief <small>aperçu</small></h1>
+    <label>Édition : <select id="choix" aria-label="Choisir une édition"></select></label>
+  </header>
+  <div id="contenu"><p>Chargement…</p></div>
+</main>
+<script>
+"use strict";
+const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+function dateLongue(iso) {
+  const [a, m, j] = iso.split("-").map(Number);
+  const d = new Date(Date.UTC(a, m - 1, j));
+  return `${JOURS[d.getUTCDay()]} ${j} ${MOIS[m - 1]} ${a}`;
+}
+
+function heure(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleString("fr-FR", { timeZone: "Europe/Paris", weekday: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+function el(balise, attributs = {}, ...enfants) {
+  const n = document.createElement(balise);
+  for (const [k, v] of Object.entries(attributs)) {
+    if (k === "class") n.className = v; else if (v !== false && v != null) n.setAttribute(k, v === true ? "" : v);
+  }
+  for (const e of enfants) if (e != null) n.append(e);
+  return n;
+}
+
+function afficherEdition(ed) {
+  const zone = document.getElementById("contenu");
+  zone.replaceChildren();
+  zone.append(el("h2", { class: "titre-edition" },
+    `Veille du ${dateLongue(ed.date)} — ${ed.nb_items} actualité${ed.nb_items > 1 ? "s" : ""}`));
+  if (ed.resumes_degrades) {
+    zone.append(el("div", { class: "bandeau" },
+      "Résumés automatiques indisponibles pour une partie de l'édition : l'extrait fourni par la source est affiché à la place."));
+  }
+  for (const section of ed.sections) {
+    const bloc = el("details", { class: "section", open: true },
+      el("summary", {}, section.nom, el("span", { class: "compte" }, String(section.items.length))));
+    if (!section.items.length) bloc.append(el("div", { class: "vide" }, "Rien de notable aujourd'hui"));
+    for (const item of section.items) {
+      const meta = [item.source, heure(item.publie_le)];
+      if (item.autres_sources && item.autres_sources.length) meta.push("aussi : " + item.autres_sources.join(", "));
+      bloc.append(el("article", {},
+        el("h3", {}, el("a", { href: item.lien, target: "_blank", rel: "noopener noreferrer" }, item.titre),
+          item.deja_signale ? el("span", { class: "badge" }, "déjà signalée") : null),
+        el("p", { class: "resume" }, item.resume),
+        el("p", { class: "pourquoi" }, el("b", {}, "Pourquoi c'est important : "), item.pourquoi),
+        el("div", { class: "meta" }, meta.filter(Boolean).join(" · "))));
+    }
+    if (section.sources_en_echec && section.sources_en_echec.length) {
+      bloc.append(el("div", { class: "echec" }, "Source injoignable lors de la collecte : " + section.sources_en_echec.join(", ")));
+    }
+    zone.append(bloc);
+  }
+  if (ed.journal) {
+    const j = ed.journal;
+    const texte = [
+      `Généré le ${heure(j.genere_le)} (publiée le ${heure(ed.publiee_le)}) en ${j.duree_secondes} s`,
+      `Articles publiés après le ${heure(j.depuis)}`,
+      `Modèle : ${j.modele} — ${j.requetes_modele} requête(s)`,
+      `Configuration : ${j.configuration}`,
+      `Sources lues : ${j.sources_lues}, en échec : ${j.sources_en_echec} — articles collectés : ${j.articles_collectes}`,
+      "Écartés : " + Object.entries(j.ecartes || {}).map(([k, v]) => `${k} ${v}`).join(", "),
+    ].join("\n");
+    const journal = el("details", { class: "journal" }, el("summary", {}, "Journal d'exécution"), el("pre", {}, texte));
+    for (const e of j.erreurs || []) journal.append(el("div", { class: "erreur" }, "⚠ " + e));
+    zone.append(journal);
+  }
+}
+
+async function chargerJson(chemin) {
+  const r = await fetch(chemin, { cache: "no-cache" });
+  if (!r.ok) throw new Error(`${chemin} : HTTP ${r.status}`);
+  return r.json();
+}
+
+async function demarrer() {
+  const choix = document.getElementById("choix");
+  try {
+    const index = await chargerJson("index.json");
+    if (!index.editions.length) throw new Error("aucune édition publiée pour l'instant");
+    for (const e of index.editions) choix.append(el("option", { value: e.fichier }, `${e.date} (${e.nb_items})`));
+    const demande = new URLSearchParams(location.search).get("date");
+    if (demande) choix.value = `editions/${demande}.json`;
+    if (!choix.value) choix.selectedIndex = 0;
+    const ouvrir = async () => {
+      afficherEdition(await chargerJson(choix.value));
+      history.replaceState(null, "", "?date=" + choix.value.match(/\d{4}-\d{2}-\d{2}/)[0]);
+    };
+    choix.addEventListener("change", () => ouvrir().catch(erreur));
+    await ouvrir();
+  } catch (e) { erreur(e); }
+}
+
+function erreur(e) {
+  const zone = document.getElementById("contenu");
+  zone.replaceChildren(el("p", { class: "erreur" }, "Impossible d'afficher l'édition : " + e.message),
+    location.protocol === "file:"
+      ? el("p", {}, "Ouvrez cette page via un petit serveur local (voir le README) : un navigateur ne lit pas les fichiers JSON ouverts directement depuis le disque.")
+      : null);
+}
+
+demarrer();
+</script>
+</body>
+</html>

@@ -15,3 +15,6 @@ compte-service*.json
 # Divers
 .DS_Store
 Thumbs.db
+
+# Réglages locaux de Claude Code
+.claude/
