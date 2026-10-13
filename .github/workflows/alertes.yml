@@ -1,0 +1,63 @@
+# Alertes en journée OnlyBrief (ALR-01, ALR-02, NOT-08).
+# Démarre toutes les heures de 7h à 20h UTC ; le script ne travaille qu'à
+# 9h, 11h, 13h, 15h, 17h, 19h et 21h, heure de Paris (été comme hiver).
+name: Alertes en journée
+
+on:
+  schedule:
+    - cron: "2 7-20 * * *"
+  workflow_dispatch:
+    inputs:
+      maintenant:
+        description: "Vérifier tout de suite, hors créneau (essai)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onlybrief-publication
+  cancel-in-progress: false
+
+jobs:
+  alerte:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: service/pyproject.toml
+
+      - name: Installer le service
+        run: pip install ./service
+
+      - name: Chercher une annonce majeure
+        id: alerte
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MANUEL: ${{ github.event_name == 'workflow_dispatch' && inputs.maintenant }}
+        run: |
+          if [ "$MANUEL" = "true" ]; then
+            python -m onlybrief alerte
+          else
+            python -m onlybrief alerte --planifiee
+          fi
+
+      - name: Publier l'alerte
+        if: steps.alerte.outputs.a_publier == 'true'
+        run: bash .github/scripts/publier.sh "Alerte du ${{ steps.alerte.outputs.date }} (automatique)"
+
+      - name: Notifier l'alerte
+        if: steps.alerte.outputs.a_publier == 'true'
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python -m onlybrief notifier alerte --date "${{ steps.alerte.outputs.date }}"
+
+      - name: Enregistrer l'envoi de la notification
+        if: always() && steps.alerte.outputs.a_publier == 'true'
+        run: bash .github/scripts/publier.sh "Notification de l'alerte du ${{ steps.alerte.outputs.date }}"

@@ -1,0 +1,69 @@
+# Édition quotidienne OnlyBrief (COL-01, COL-09, COL-11, NOT-01).
+# GitHub planifie en UTC : les deux horaires (heure d'été / heure d'hiver) sont déclarés,
+# 45 minutes avant la publication. Le script calcule l'heure de Paris et ne travaille
+# que dans le bon créneau ; sinon il sort sans rien faire.
+#   7h30 lun–ven : 4h45 UTC (été) et 5h45 UTC (hiver)
+#   10h  sam–dim : 7h15 UTC (été) et 8h15 UTC (hiver)
+name: Édition quotidienne
+
+on:
+  schedule:
+    - cron: "45 4 * * 1-5"
+    - cron: "45 5 * * 1-5"
+    - cron: "15 7 * * 0,6"
+    - cron: "15 8 * * 0,6"
+  workflow_dispatch:
+    inputs:
+      maintenant:
+        description: "Produire l'édition tout de suite, hors créneau (essai)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onlybrief-publication
+  cancel-in-progress: false
+
+jobs:
+  edition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: service/pyproject.toml
+
+      - name: Installer le service
+        run: pip install ./service
+
+      - name: Préparer l'édition
+        id: edition
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MANUEL: ${{ github.event_name == 'workflow_dispatch' && inputs.maintenant }}
+        run: |
+          if [ "$MANUEL" = "true" ]; then
+            python -m onlybrief edition
+          else
+            python -m onlybrief edition --planifiee
+          fi
+
+      - name: Publier sur GitHub Pages
+        if: steps.edition.outputs.a_publier == 'true'
+        run: bash .github/scripts/publier.sh "Édition du ${{ steps.edition.outputs.date }} (automatique)"
+
+      - name: Notifier à l'heure exacte
+        if: steps.edition.outputs.a_publier == 'true'
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python -m onlybrief notifier edition --date "${{ steps.edition.outputs.date }}"
+
+      - name: Enregistrer l'envoi de la notification
+        if: always() && steps.edition.outputs.a_publier == 'true'
+        run: bash .github/scripts/publier.sh "Notification de l'édition du ${{ steps.edition.outputs.date }}"
