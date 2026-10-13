@@ -1,0 +1,98 @@
+# Construction et publication de l'APK signé (section 9, lot 5).
+# Se déclenche quand une étiquette vX.Y.Z est poussée, par exemple :
+#   git tag v1.0.0
+#   git push origin v1.0.0
+# Secrets nécessaires (Settings > Secrets and variables > Actions) :
+#   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD  (clé de signature)
+#   GOOGLE_SERVICES_JSON                                          (contenu de google-services.json)
+name: APK signé
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: onlybrief-publication
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Calculer la version
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          IFS=. read -r MAJ MIN COR <<< "$VERSION"
+          CODE=$(( MAJ * 10000 + MIN * 100 + COR ))
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Version $VERSION, code $CODE"
+
+      - name: Préparer la signature et Firebase
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Secret KEYSTORE_BASE64 absent : voir MISE_EN_SERVICE.md, étape « Clé de signature »."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/onlybrief.jks"
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
+          else
+            echo "::warning::GOOGLE_SERVICES_JSON absent : APK construit sans notifications."
+          fi
+
+      - name: Tester et construire
+        working-directory: app
+        env:
+          ONLYBRIEF_KEYSTORE_FILE: ${{ runner.temp }}/onlybrief.jks
+          ONLYBRIEF_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          ONLYBRIEF_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          ONLYBRIEF_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew --no-daemon testDebugUnitTest assembleRelease \
+            -Ponlybrief.versionName=${{ steps.version.outputs.version }} \
+            -Ponlybrief.versionCode=${{ steps.version.outputs.code }}
+
+      - name: Vérifier la signature et la taille (NF-05)
+        run: |
+          APK=app/build/outputs/apk/release/OnlyBrief-release.apk
+          "$(ls -d "$ANDROID_HOME"/build-tools/* | tail -1)/apksigner" verify --print-certs "$APK" | head -3
+          TAILLE=$(stat -c %s "$APK")
+          echo "Taille : $(( TAILLE / 1024 )) Ko"
+          [ "$TAILLE" -lt $(( 15 * 1024 * 1024 )) ] || { echo "::error::APK de plus de 15 Mo"; exit 1; }
+          cp "$APK" "onlybrief-${{ steps.version.outputs.version }}.apk"
+
+      - name: Publier la version sur GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "onlybrief-${{ steps.version.outputs.version }}.apk" \
+            --title "OnlyBrief ${{ steps.version.outputs.version }}" \
+            --notes "APK signé. Installation : ouvrir le fichier sur le téléphone (autoriser les sources inconnues). Une nouvelle version s'installe par-dessus l'ancienne, l'historique est conservé."
+
+      - name: Mettre à jour version.json (APP-15)
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+          cat > docs/version.json <<JSON
+          { "version": "${{ steps.version.outputs.version }}", "code": ${{ steps.version.outputs.code }}, "apk": "https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF_NAME}/onlybrief-${{ steps.version.outputs.version }}.apk" }
+          JSON
+          sed -i 's/^          //' docs/version.json
+          bash .github/scripts/publier.sh "Version ${{ steps.version.outputs.version }} publiée"
