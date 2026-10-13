@@ -8,6 +8,8 @@ dependencies = [
     "httpx>=0.27",
     "PyYAML>=6.0",
     "tzdata>=2024.1",            # fuseaux horaires sous Windows
+    "google-auth>=2.30",         # jeton d'accès FCM (compte de service)
+    "requests>=2.31",
 ]
 
 [project.optional-dependencies]
