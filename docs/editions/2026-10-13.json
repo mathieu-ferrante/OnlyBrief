@@ -1,0 +1,198 @@
+{
+  "date": "2026-10-13",
+  "publiee_le": "2026-10-13T10:53:00+02:00",
+  "nb_items": 13,
+  "resumes_degrades": false,
+  "sections": [
+    {
+      "sujet_id": "ia",
+      "nom": "IA / LLM",
+      "sources_en_echec": [],
+      "items": [
+        {
+          "id": "ia-2026-10-13-01",
+          "titre": "Meta's new frontier model Muse Wonder Full breaks into the AI top tier",
+          "resume": "Les nouveaux modèles Muse Wonder de Meta intègrent le top trois sur plusieurs benchmarks avec de fortes hausses pour les tâches d'agents, malgré un coût multiplié par trois.",
+          "pourquoi": "Meta positionne ses nouveaux modèles phares au sommet du classement des performances en IA.",
+          "deja_signale": false,
+          "source": "The Decoder",
+          "lien": "https://the-decoder.com/metas-new-frontier-model-muse-wonder-full-breaks-into-the-ai-top-tier/",
+          "publie_le": "2026-10-12T20:48:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "ia-2026-10-13-02",
+          "titre": "Sakana AI's self-improving model gets better at solving and judging, but can't catch its own blind spots",
+          "resume": "La méthode MASS de Sakana AI permet à un modèle de s'améliorer seul, mais l'outil peut renforcer ses propres erreurs s'il les manque dans tous ses rôles.",
+          "pourquoi": "L'auto-amélioration des LLM montre des progrès notables tout en révélant de nouveaux risques.",
+          "deja_signale": false,
+          "source": "The Decoder",
+          "lien": "https://the-decoder.com/sakana-ais-self-improving-model-gets-better-at-solving-and-judging-but-cant-catch-its-own-blind-spots/",
+          "publie_le": "2026-10-12T19:58:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "ia-2026-10-13-03",
+          "titre": "Clearing chat history helps AI agents find better solutions",
+          "resume": "Des chercheurs de Microsoft montrent que vider l'historique des chats tout en gardant l'espace de travail aide les agents IA à éviter les blocages.",
+          "pourquoi": "Cette méthode améliore l'efficacité des agents autonomes sous contrainte de calcul.",
+          "deja_signale": false,
+          "source": "The Decoder",
+          "lien": "https://the-decoder.com/clearing-chat-history-helps-ai-agents-find-better-solutions/",
+          "publie_le": "2026-10-12T18:10:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "ia-2026-10-13-04",
+          "titre": "Microsoft plans to scale its own Maia AI chips to gigawatt levels by 2027",
+          "resume": "Microsoft prévoit de faire des puces Azure Maia son principal système d'inférence en IA dès 2027 pour atteindre une échelle multi-gigawatts.",
+          "pourquoi": "Microsoft mise massivement sur ses propres semi-conducteurs pour propulser l'IA.",
+          "deja_signale": false,
+          "source": "The Decoder",
+          "lien": "https://the-decoder.com/microsoft-plans-to-scale-its-own-maia-ai-chips-to-gigawatt-levels-by-2027/",
+          "publie_le": "2026-10-12T17:24:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "ia-2026-10-13-05",
+          "titre": "Google Deepmind's AlphaProof Nexus solved dozens of open math problems and actually got peer reviewed",
+          "resume": "AlphaProof Nexus de Google DeepMind a résolu des dizaines de problèmes mathématiques ouverts, dont des énigmes d'Erdős, avec une validation par des pairs.",
+          "pourquoi": "Une avancée majeure validée scientifiquement dans la résolution de mathématiques par l'IA.",
+          "deja_signale": false,
+          "source": "The Decoder",
+          "lien": "https://the-decoder.com/google-deepminds-alphaproof-nexus-solved-dozens-of-open-math-problems-and-actually-got-peer-reviewed/",
+          "publie_le": "2026-10-12T11:35:00+02:00",
+          "autres_sources": []
+        }
+      ]
+    },
+    {
+      "sujet_id": "tech",
+      "nom": "Tech générale",
+      "sources_en_echec": [],
+      "items": [
+        {
+          "id": "tech-2026-10-13-01",
+          "titre": "Meta revient dans la course aux modèles frontière avec Muse Wonder",
+          "resume": "Meta lance Muse Wonder, une nouvelle famille de modèles de pointe dont les performances rivalisent avec Opus 5.5 et GPT-6.",
+          "pourquoi": "Meta revient sur le devant de la scène des modèles frontières avec une IA taillée pour les agents.",
+          "deja_signale": false,
+          "source": "Next",
+          "lien": "https://next.ink/261349/meta-revient-dans-la-course-aux-modeles-frontiere-avec-muse-wonder/",
+          "publie_le": "2026-10-13T08:22:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "tech-2026-10-13-02",
+          "titre": "« Plus de code écrit à la main » : Epic Games retarde son jeu Star Wars + Marvel et demande à ses développeurs de tout faire avec l’IA",
+          "resume": "Epic Games reporte son jeu de tir Star Wars et Marvel et impose à son équipe de tout produire avec l'intelligence artificielle.",
+          "pourquoi": "Le studio bascule vers un modèle de développement entièrement orienté vers l'IA, sans code manuscrit.",
+          "deja_signale": false,
+          "source": "Frandroid",
+          "lien": "https://www.frandroid.com/culture-tech/intelligence-artificielle/3282665_plus-de-code-ecrit-a-la-main-epic-games-retarde-son-jeu-star-wars-marvel-et-demande-a-ses-developpeurs-de-tout-faire-avec-lia",
+          "publie_le": "2026-10-13T09:36:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "tech-2026-10-13-03",
+          "titre": "[MàJ] Des frigos piratés dans les supermarchés à cause d’une console de gestion exposée",
+          "resume": "Des pirates ont pris le contrôle des systèmes de régulation thermique de centaines de supermarchés en France. Le parquet de Paris enquête.",
+          "pourquoi": "Une cyberattaque d'envergure met en lumière les failles de sécurité des infrastructures de réfrigération connectées.",
+          "deja_signale": false,
+          "source": "Next",
+          "lien": "https://next.ink/261236/des-frigos-pirates-dans-des-supermarches-a-cause-dequipements-obsoletes-ou-non-mis-a-jour/",
+          "publie_le": "2026-10-12T17:55:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "tech-2026-10-13-04",
+          "titre": "En cryptographie, « post-quantique n’est pas post-IA »",
+          "resume": "Thales alerte sur le fait qu'un algorithme post-quantique peut tout de même être vulnérable face aux attaques de l'intelligence artificielle.",
+          "pourquoi": "La transition cryptographique doit intégrer la menace de l'IA en plus de celle du quantique.",
+          "deja_signale": false,
+          "source": "Next",
+          "lien": "https://next.ink/261215/en-cryptographie-post-quantique-nest-pas-post-ia/",
+          "publie_le": "2026-10-13T08:47:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "tech-2026-10-13-05",
+          "titre": "Google transforme Gemini : la nouvelle interface accueille Spark, l’agent IA qui travaille pour vous 24h/24",
+          "resume": "Google intègre l'agent IA Spark au cœur de la nouvelle interface de Gemini pour exécuter des tâches en arrière-plan 24h/24.",
+          "pourquoi": "Google fait évoluer son assistant vers un agent autonome capable de travailler en continu.",
+          "deja_signale": false,
+          "source": "Frandroid",
+          "lien": "https://www.frandroid.com/culture-tech/intelligence-artificielle/google-gemini/3282659_google-transforme-gemini-la-nouvelle-interface-accueille-spark-lagent-ia-qui-travaille-pour-vous-24h-24",
+          "publie_le": "2026-10-13T10:13:00+02:00",
+          "autres_sources": []
+        }
+      ]
+    },
+    {
+      "sujet_id": "cs2",
+      "nom": "Counter-Strike / esport",
+      "sources_en_echec": [
+        "CS2 — actualités officielles (Steam)"
+      ],
+      "items": [
+        {
+          "id": "cs2-2026-10-13-01",
+          "titre": "Falcons announce m0NESY contract extension",
+          "resume": "L'organisation Falcons annonce la prolongation de contrat de son sniper russe m0NESY.",
+          "pourquoi": "Un mouvement majeur pour l'effectif de l'organisation saoudienne.",
+          "deja_signale": false,
+          "source": "HLTV.org",
+          "lien": "https://www.hltv.org/news/45711/falcons-announce-m0nesy-contract-extension",
+          "publie_le": "2026-10-12T18:36:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "cs2-2026-10-13-02",
+          "titre": "TOBIZ returns to MOUZ as head of talent development",
+          "resume": "TOBIZ quitte son poste d'entraîneur principal chez HEROIC pour revenir chez MOUZ en tant que responsable du développement des talents.",
+          "pourquoi": "Un changement notable au sein du staff technique de MOUZ.",
+          "deja_signale": false,
+          "source": "HLTV.org",
+          "lien": "https://www.hltv.org/news/45704/tobiz-returns-to-mouz-as-head-of-talent-development",
+          "publie_le": "2026-10-12T12:34:00+02:00",
+          "autres_sources": []
+        },
+        {
+          "id": "cs2-2026-10-13-03",
+          "titre": "Wildcard's Major chances soar with FRAG University title",
+          "resume": "Wildcard remporte le titre FRAG University, renforçant ses chances de qualification pour le Major de Singapour.",
+          "pourquoi": "Une avancée importante pour Wildcard dans la course aux qualifications en Amérique.",
+          "deja_signale": false,
+          "source": "HLTV.org",
+          "lien": "https://www.hltv.org/news/45703/wildcards-major-chances-soar-with-frag-university-title",
+          "publie_le": "2026-10-12T11:17:00+02:00",
+          "autres_sources": []
+        }
+      ]
+    }
+  ],
+  "journal": {
+    "genere_le": "2026-10-13T10:53:00+02:00",
+    "collecte_le": "2026-10-13T10:53:40+02:00",
+    "depuis": "2026-10-12T07:30:00+02:00",
+    "version_service": "0.1.0",
+    "modele": "gemini/gemini-3.5-flash-lite",
+    "requetes_modele": 3,
+    "configuration": "valide",
+    "sources_lues": 12,
+    "sources_en_echec": 1,
+    "articles_collectes": 2418,
+    "ecartes": {
+      "antérieur à l'édition précédente": 2343,
+      "doublon": 0,
+      "hors mots-clés (source filtrée)": 6,
+      "lien déjà cité (14 jours)": 0,
+      "mot-clé d'exclusion": 1,
+      "non retenu par le tri": 55
+    },
+    "erreurs": [
+      "source injoignable cs2/CS2 — actualités officielles (Steam) : ConnectError : [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée"
+    ],
+    "duree_secondes": 13.3
+  }
+}

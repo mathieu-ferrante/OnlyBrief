@@ -1,0 +1,96 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# OnlyBrief — sujets suivis
+#
+# Ce fichier est le SEUL endroit à modifier pour ajouter, retirer ou changer un
+# sujet. La modification prend effet à l'édition suivante, sans toucher à
+# l'application.
+#
+# Règles d'écriture :
+#   - l'indentation se fait avec des ESPACES (jamais de tabulation) ;
+#   - un texte contenant « : » ou « # » se met entre guillemets ;
+#   - une liste s'écrit [a, b, c] ou un élément par ligne précédé de « - ».
+#
+# Champs d'un sujet :
+#   id                identifiant court, unique, en minuscules (ex. : ia)
+#   nom               titre de la section dans l'application
+#   actif             true = suivi ; false = suspendu sans être supprimé
+#   ordre             position de la section (1 = en haut)
+#   max_items         nombre maximal d'actualités dans la section
+#   langues           langues acceptées (fr, en)
+#   mots_cles         mots-clés du sujet ; [] = tout le flux est candidat
+#   exclusions        un article contenant l'un de ces mots est écarté
+#   mots_cles_alerte  mots-clés pouvant déclencher une alerte en journée
+#   consignes         (facultatif) consignes en langage courant pour le modèle
+#   sources           liste des flux RSS / Atom :
+#       nom                     nom affiché de la source
+#       flux                    adresse du flux (https://…)
+#       mots_cles_obligatoires  (facultatif) true = ne garder que les articles
+#                               contenant un des mots_cles du sujet
+#
+# Un fichier mal formé est refusé : le service garde alors la dernière
+# configuration valide et signale l'erreur dans son journal.
+# ─────────────────────────────────────────────────────────────────────────────
+
+modele:
+  fournisseur: gemini            # réglage du service, modifiable sans toucher à l'application (gemini, groq, mistral)
+  nom: "gemini-3.5-flash-lite"
+
+sujets:
+  - id: ia
+    nom: "IA / LLM"
+    actif: true
+    ordre: 1
+    max_items: 5
+    langues: [fr, en]
+    mots_cles: ["LLM", "modèle de langage", "IA générative", "AI Act", "agent IA"]
+    exclusions: ["horoscope", "crypto"]
+    mots_cles_alerte: ["nouveau modèle", "GPT", "Claude", "Gemini"]
+    sources:
+      - nom: "OpenAI News"
+        flux: "https://openai.com/news/rss.xml"
+      - nom: "Hugging Face Blog"
+        flux: "https://huggingface.co/blog/feed.xml"
+      - nom: "Simon Willison"
+        flux: "https://simonwillison.net/atom/everything/"
+      - nom: "ActuIA"
+        flux: "https://www.actuia.com/feed/"
+      - nom: "The Decoder"
+        flux: "https://the-decoder.com/feed/"
+
+  - id: tech
+    nom: "Tech générale"
+    actif: true
+    ordre: 2
+    max_items: 5
+    langues: [fr, en]
+    mots_cles: []        # vide : tout le flux est candidat
+    exclusions: ["bon plan", "promo"]
+    sources:
+      - nom: "Next"
+        flux: "https://next.ink/feed/"
+      - nom: "Numerama"
+        flux: "https://www.numerama.com/feed/"
+      - nom: "Frandroid"
+        flux: "https://www.frandroid.com/feed"
+      - nom: "CERT-FR (alertes de sécurité)"
+        flux: "https://www.cert.ssi.gouv.fr/alerte/feed/"
+      - nom: "Ars Technica"
+        flux: "https://feeds.arstechnica.com/arstechnica/index"
+
+  - id: cs2
+    nom: "Counter-Strike / esport"
+    actif: true
+    ordre: 3
+    max_items: 5
+    langues: [fr, en]
+    mots_cles: ["CS2", "Counter-Strike", "Major", "patch", "transfert"]
+    exclusions: ["skin", "case opening"]
+    consignes: "Scène française et mondiale ; ignorer les compétitions en dessous du tier 2."
+    sources:
+      - nom: "HLTV.org"
+        flux: "https://www.hltv.org/rss/news"
+      - nom: "CS2 — actualités officielles (Steam)"
+        flux: "https://store.steampowered.com/feeds/news/app/730/"
+      - nom: "Dexerto.fr"
+        flux: "https://www.dexerto.fr/feed/"
+        mots_cles_obligatoires: true
