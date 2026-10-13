@@ -129,6 +129,9 @@ def commande_alerte(chemins: Chemins, args) -> int:
 
 def commande_notifier(chemins: Chemins, args) -> int:
     jour = args.date
+    if not os.environ.get("FIREBASE_SERVICE_ACCOUNT", "").strip():
+        log.warning("Notification non envoyée : secret FIREBASE_SERVICE_ACCOUNT absent (Firebase pas encore configuré)")
+        return 0
     try:
         if args.type == "edition":
             relatif = f"editions/{jour.isoformat()}.json"
