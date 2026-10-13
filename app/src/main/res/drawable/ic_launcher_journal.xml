@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Journal plié : page arrière, page avant pliée, titre et colonnes de texte. Zone sûre 66 dp centrée. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- page arrière (pli) -->
+    <path android:fillColor="#BFD3F7" android:pathData="M30,36 L74,32 L78,74 L34,78 Z" />
+    <!-- page avant -->
+    <path android:fillColor="#FFFFFF" android:pathData="M28,38 L76,38 L76,76 Q76,80 72,80 L32,80 Q28,80 28,76 Z" />
+    <!-- pli vertical -->
+    <path android:fillColor="#D6E2F8" android:pathData="M51,38 L53,38 L53,80 L51,80 Z" />
+    <!-- titre -->
+    <path android:fillColor="#123E8C" android:pathData="M33,43 L71,43 L71,49 L33,49 Z" />
+    <!-- colonne gauche -->
+    <path android:fillColor="#1D5FD1" android:pathData="M33,53 L48,53 L48,63 L33,63 Z" />
+    <path android:fillColor="#9DB6E3" android:pathData="M33,66 L48,66 L48,68 L33,68 Z M33,71 L48,71 L48,73 L33,73 Z" />
+    <!-- colonne droite -->
+    <path android:fillColor="#9DB6E3" android:pathData="M56,53 L71,53 L71,55 L56,55 Z M56,58 L71,58 L71,60 L56,60 Z M56,63 L71,63 L71,65 L56,65 Z M56,68 L71,68 L71,70 L56,70 Z M56,73 L66,73 L66,75 L56,75 Z" />
+</vector>

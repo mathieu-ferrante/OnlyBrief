@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OnlyBrief</string>
+    <string name="canal_editions">Éditions</string>
+    <string name="canal_editions_description">La veille du matin, une fois par jour</string>
+    <string name="canal_alertes">Alertes</string>
+    <string name="canal_alertes_description">Une annonce majeure en cours de journée, au plus une par jour</string>
+</resources>

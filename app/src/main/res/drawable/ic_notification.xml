@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icône de notification : silhouette monochrome du journal -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M3,5h18v13a2,2 0,0 1,-2 2H5a2,2 0,0 1,-2 -2V5zM5,7v2h14V7H5zM5,11v5h6v-5H5zM13,11v1h6v-1h-6zM13,13.5v1h6v-1h-6zM13,16v1h4v-1h-4z" />
+</vector>
