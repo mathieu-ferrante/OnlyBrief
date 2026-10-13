@@ -1,75 +1,84 @@
 # OnlyBrief
 
-Veille quotidienne livrée sur Android : chaque matin, une édition courte organisée par sujet
-(IA / LLM, tech générale, Counter-Strike / esport…), avec pour chaque actualité un résumé de deux
-lignes en français et une ligne « Pourquoi c'est important ».
+Veille quotidienne livrée sur Android : chaque matin (7 h 30 en semaine, 10 h le week-end), une
+édition courte organisée par sujet, avec pour chaque actualité un résumé de deux lignes en
+français et une ligne « Pourquoi c'est important ». Au plus une alerte par jour pour une annonce majeure.
 
-- `sujets.yaml` : les sujets suivis et leurs sources. **C'est le seul fichier à modifier pour changer la veille.**
-- `service/` : le service Python qui collecte, filtre, fait résumer et publie l'édition.
-- `docs/` : les fichiers publiés (éditions JSON, index, page `apercu.html`).
-- `etat/` : la mémoire du service (liens déjà cités, dernière configuration valide).
+| Dossier | Rôle |
+| --- | --- |
+| `sujets.yaml` | sujets suivis et leurs sources : **le seul fichier à modifier pour changer la veille** |
+| `service/` | service Python : collecte, filtres, résumés (Google Gemini), publication, notifications |
+| `docs/` | fichiers publiés par GitHub Pages : éditions, alertes, `index.json`, `version.json`, `apercu.html` |
+| `etat/` | mémoire du service : liens cités (14 jours), dernière configuration valide, notifications envoyées |
+| `app/` | application Android (Kotlin, Compose, Room, Firebase Cloud Messaging) |
+| `.github/workflows/` | `edition.yml` (chaque matin), `alertes.yml` (toutes les 2 h), `apk.yml` (version signée) |
 
-Référence complète : [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md).
-
-> Le modèle de langage est **Google Gemini** (offre gratuite, modèle Flash-Lite) : GitHub Models,
-> prévu au cahier des charges, a été retiré par GitHub le 30 juillet 2026.
+Première installation : voir **[MISE_EN_SERVICE.md](MISE_EN_SERVICE.md)**.
+Référence : [CAHIER_DES_CHARGES.md](CAHIER_DES_CHARGES.md). Le modèle de langage est Google Gemini
+(offre gratuite) : GitHub Models, prévu à l'origine, a été retiré par GitHub le 30 juillet 2026.
 
 ---
 
-## Lancer le service sur son poste
+## Note d'exploitation
 
-### 1. Installation (une seule fois)
+### Ajouter, modifier ou suspendre un sujet
 
-Il faut Python 3.12 ou plus récent. Ouvrir un terminal **à la racine du dépôt**.
+1. Sur GitHub, ouvrir `sujets.yaml` → icône crayon (*Edit*).
+2. Copier un bloc de sujet existant (de `- id:` jusqu'à ses sources), changer `id`, `nom`, `ordre`, les mots-clés et les sources.
+   Les explications de chaque champ sont en tête du fichier. Pour suspendre un sujet sans le supprimer : `actif: false`.
+3. *Commit changes*. L'édition suivante contient la nouvelle section, sans toucher à l'application.
 
-**Windows (PowerShell)**
+Si le fichier est mal écrit, l'édition part quand même avec la dernière configuration valide et l'erreur
+apparaît dans le journal (ci-dessous) et en bas de l'aperçu. Pour vérifier avant d'enregistrer, sur son poste :
+`python -m onlybrief verifier-config`.
 
-```powershell
-py -3.13 -m venv service\.venv
-service\.venv\Scripts\python -m pip install -e "service[dev]"
-```
+### Lire le journal d'exécution
 
-**Mac**
+- Onglet **Actions** du dépôt → « Édition quotidienne » ou « Alertes en journée » → l'exécution voulue →
+  étape « Préparer l'édition ». On y lit les sources lues, les articles retenus et écartés, les requêtes au modèle et les erreurs.
+- Résumé dans chaque édition : <https://mathieu-ferrante.github.io/OnlyBrief/apercu.html> → « Journal d'exécution » en bas de page.
+- Une exécution en échec (aucune édition produite) apparaît en rouge et GitHub envoie un courriel ; aucune notification vide n'est envoyée.
+- Une source en panne trois jours de suite est signalée dans les erreurs : remplacer son flux dans `sujets.yaml`.
 
-```bash
-python3 -m venv service/.venv
-service/.venv/bin/python -m pip install -e "service[dev]"
-```
+### Réglages de batterie HyperOS (POCO M7 Pro 5G)
 
-### 2. Clé Gemini (gratuite, jamais dans le dépôt)
+*Paramètres* → *Applications* → *Gérer les applications* → *OnlyBrief* :
+**Démarrage automatique** activé, *Économiseur de batterie* → **Aucune restriction**.
+Sans ces réglages, la notification peut arriver en retard ; l'édition est de toute façon téléchargée à l'ouverture.
 
-1. Aller sur <https://aistudio.google.com/apikey> avec son compte Google, accepter les conditions
-   et cliquer sur « Create API key ». Aucune carte bancaire n'est demandée.
-2. Copier la clé et la donner au terminal **pour la session en cours seulement** :
+### Publier et installer une nouvelle version de l'application
 
-   - Windows : `$env:GEMINI_API_KEY = "collez-la-cle-ici"`
-   - Mac : `export GEMINI_API_KEY="collez-la-cle-ici"`
+1. Mettre à jour le code, puis dans un terminal à la racine du dépôt :
+   `git tag v1.0.1` puis `git push origin v1.0.1` (numéro toujours supérieur au précédent).
+2. L'action « APK signé » construit et publie l'APK dans *Releases* ; l'écran Réglages de l'application signale la nouvelle version.
+3. Sur le téléphone, télécharger l'APK depuis *Releases* et l'ouvrir : il s'installe par-dessus, l'historique est conservé.
 
-La clé ne doit jamais être écrite dans un fichier du dépôt (le dépôt est public).
+**Recompiler à la main** (tiers ou nouveau poste) : installer Android Studio, ouvrir le dossier `app/`, puis
+`gradlew assembleRelease` (Windows : `app\gradlew.bat assembleRelease`). Pour signer, créer `app/signature.properties`
+(jamais commité) avec `magasin=<chemin du .jks>`, `motDePasseMagasin=…`, `alias=onlybrief`, `motDePasseCle=…`.
+La clé de signature est la même pour toutes les versions : elle est sauvegardée en deux copies hors du poste.
 
-### 3. Produire l'édition du jour
+---
 
-- Windows : `service\.venv\Scripts\python -m onlybrief edition`
-- Mac : `service/.venv/bin/python -m onlybrief edition`
+## Développement sur son poste
 
-Le journal s'affiche dans le terminal. L'édition est écrite dans `docs/editions/AAAA-MM-JJ.json`
-et `docs/index.json` est mis à jour. Relancer la commande le même jour reconstruit l'édition du jour.
+**Installation** (une fois), à la racine du dépôt :
 
-Autres commandes utiles :
+- Windows : `py -3.13 -m venv service\.venv` puis `service\.venv\Scripts\python -m pip install -e "service[dev]"`
+- Mac : `python3 -m venv service/.venv` puis `service/.venv/bin/python -m pip install -e "service[dev]"`
+
+**Clé Gemini** : créer à la racine du dépôt un fichier `.env` (ignoré par git, jamais publié) contenant
+`GEMINI_API_KEY=ta-cle`.
+
+**Commandes** (Windows : `service\.venv\Scripts\python -m onlybrief …` ; Mac : `service/.venv/bin/python -m onlybrief …`) :
 
 | Commande | Effet |
 | --- | --- |
-| `python -m onlybrief verifier-config` | vérifie `sujets.yaml` sans rien collecter |
-| `python -m onlybrief edition --sans-modele` | simule un modèle indisponible (résumés = chapôs RSS) |
+| `edition` | prépare l'édition du jour dans `docs/` |
+| `edition --sans-modele` | simule un modèle indisponible (résumés = chapôs RSS) |
+| `alerte` | cherche une annonce majeure maintenant |
+| `verifier-config` | vérifie `sujets.yaml` |
 
-### 4. Voir l'édition dans le navigateur
+**Aperçu** : `python -m http.server 8000 --directory docs` puis <http://localhost:8000/apercu.html>.
 
-- Windows : `service\.venv\Scripts\python -m http.server 8000 --directory docs`
-- Mac : `service/.venv/bin/python -m http.server 8000 --directory docs`
-
-Puis ouvrir <http://localhost:8000/apercu.html>. `Ctrl+C` dans le terminal arrête le serveur.
-
-### 5. Tests automatiques
-
-- Windows : `service\.venv\Scripts\python -m pytest service`
-- Mac : `service/.venv/bin/python -m pytest service`
+**Tests** : `python -m pytest service` (service) ; dans `app/` : `gradlew testDebugUnitTest` (application).

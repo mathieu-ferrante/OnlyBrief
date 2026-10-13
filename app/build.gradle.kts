@@ -58,7 +58,7 @@ android {
             signingConfig = signingConfigs.findByName("publication")
         }
         debug {
-            applicationIdSuffix = ".debug"
+            // Même identifiant que la version publiée : un seul google-services.json suffit.
             versionNameSuffix = "-essai"
         }
     }
