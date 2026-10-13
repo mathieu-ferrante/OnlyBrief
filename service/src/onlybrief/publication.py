@@ -47,7 +47,7 @@ def construire_edition(
                 "titre": article.titre,
                 "resume": item.resume,
                 "pourquoi": item.pourquoi,
-                "deja_signale": False,
+                "deja_signale": item.deja_signale,
                 "source": article.source,
                 "lien": article.lien,
                 "publie_le": iso(article.publie_le) if article.publie_le else "",
@@ -69,10 +69,10 @@ def construire_edition(
     }
 
 
-def _ecrire_json(chemin: Path, contenu: dict) -> int:
+def ecrire_json(chemin: Path, contenu: dict) -> int:
     chemin.parent.mkdir(parents=True, exist_ok=True)
     texte = json.dumps(contenu, ensure_ascii=False, indent=2) + "\n"
-    chemin.write_text(texte, encoding="utf-8")
+    chemin.write_text(texte, encoding="utf-8", newline="\n")
     return len(texte.encode("utf-8"))
 
 
@@ -97,7 +97,7 @@ def publier(docs: Path, edition: dict, maintenant: datetime) -> Path:
     """Écrit `editions/AAAA-MM-JJ.json`, met à jour `index.json` et purge au-delà de 60 jours."""
     jour = date.fromisoformat(edition["date"])
     relatif = f"editions/{jour.isoformat()}.json"
-    taille = _ecrire_json(docs / relatif, edition)
+    taille = ecrire_json(docs / relatif, edition)
     if taille > TAILLE_MAX_EDITION:
         log.warning("Édition de %d Ko, au-delà de la limite de 100 Ko (NF-05)", taille // 1024)
     log.info("Édition écrite : %s (%d Ko, %d items)", relatif, max(1, taille // 1024), edition["nb_items"])
@@ -117,7 +117,7 @@ def publier(docs: Path, edition: dict, maintenant: datetime) -> Path:
     editions.append({"date": jour.isoformat(), "nb_items": edition["nb_items"], "fichier": relatif})
     editions = [e for e in editions if (docs / e["fichier"]).exists()]
     editions.sort(key=lambda e: e["date"], reverse=True)
-    _ecrire_json(docs / "index.json", {
+    ecrire_json(docs / "index.json", {
         "mis_a_jour_le": iso(maintenant),
         "editions": editions,
         "derniere_alerte": index.get("derniere_alerte"),

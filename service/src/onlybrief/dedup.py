@@ -100,4 +100,4 @@ class LiensCites:
     def sauvegarder(self) -> None:
         self.chemin.parent.mkdir(parents=True, exist_ok=True)
         contenu = {"liens": dict(sorted(self.liens.items(), key=lambda kv: (kv[1], kv[0])))}
-        self.chemin.write_text(json.dumps(contenu, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        self.chemin.write_text(json.dumps(contenu, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")

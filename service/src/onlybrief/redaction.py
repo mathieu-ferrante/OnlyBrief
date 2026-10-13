@@ -87,6 +87,7 @@ class ItemRedige:
     article: Article
     resume: str
     pourquoi: str
+    deja_signale: bool = False
 
 
 @dataclass
@@ -117,7 +118,7 @@ class ClientModele:
             raise ModeleIndisponible(f"variable d'environnement {variable} absente")
         return cls(modele=modele, cle=cle)
 
-    def completer(self, systeme: str, utilisateur: str) -> dict:
+    def completer(self, systeme: str, utilisateur: str, schema: dict | None = None) -> dict:
         url = FOURNISSEURS[self.modele.fournisseur][0] + "chat/completions"
         corps = {
             "model": self.modele.nom,
@@ -128,7 +129,7 @@ class ClientModele:
             ],
             "response_format": {
                 "type": "json_schema",
-                "json_schema": {"name": "edition", "schema": SCHEMA_REPONSE},
+                "json_schema": {"name": "reponse", "schema": schema or SCHEMA_REPONSE},
             },
         }
         derniere_erreur = ""
